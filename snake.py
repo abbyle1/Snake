@@ -43,10 +43,10 @@ for i in range(ROWS):
         x1 = x0 + CELL_SIZE
         y1 = y0 + CELL_SIZE
         if (i + j) % 2 == 0:
-            fill_color = BACKGROUND_COLOR_2
+            color = BACKGROUND_COLOR_1
         else:
-            fill_color = BACKGROUND_COLOR_1
-        canva.create_rectangle(x0, y0, x1, y1, fill=fill_color)
+            color = BACKGROUND_COLOR_2
+        canva.create_rectangle(x0, y0, x1, y1, fill=color)
 
 # config game :
 def init_game():
