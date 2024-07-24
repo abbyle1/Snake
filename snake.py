@@ -5,7 +5,7 @@ import random as rdm
 CELL_SIZE=40
 ROWS=10
 COLUMNS=10
-SPEED=1000 # reaction time of the loop game in millisec (bigger = slower)
+SPEED=500 # reaction time of the loop game in millisec (bigger = slower)
 BACKGROUND_COLOR_1='#111111'
 BACKGROUND_COLOR_2='#303030'
 
@@ -16,7 +16,11 @@ class Snake:
         self.squares = []
         self.color = '#00FF00'
         for (x, y) in self.coordinates:
-            square = canva.create_rectangle(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=self.color)
+            square = canva.create_rectangle(x*CELL_SIZE, 
+                                            y*CELL_SIZE, 
+                                            x*CELL_SIZE+CELL_SIZE, 
+                                            y*CELL_SIZE+CELL_SIZE, 
+                                            fill=self.color)
             self.squares.append(square)
     
     def add_body_part(self, new_part:tuple[int,int]):
@@ -28,7 +32,11 @@ class Apple:
         self.coordinates = self.__get_rdm_coord()
         x, y = self.coordinates
         self.color ='#FF0000'
-        canva.create_oval(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=self.color)
+        canva.create_oval(x*CELL_SIZE, 
+                          y*CELL_SIZE, 
+                          x*CELL_SIZE+CELL_SIZE, 
+                          y*CELL_SIZE+CELL_SIZE, 
+                          fill=self.color)
 
     @staticmethod
     def __get_rdm_coord():
@@ -49,7 +57,10 @@ label = tk.Label(window, text=f'SCORE:{score}', font=('consolas', 20))
 label.pack()
 
     # draughtboard :
-canva = tk.Canvas(window, background=BACKGROUND_COLOR_1, height=ROWS*CELL_SIZE, width=COLUMNS*CELL_SIZE)
+canva = tk.Canvas(window, 
+                  background=BACKGROUND_COLOR_1, 
+                  height=ROWS*CELL_SIZE, 
+                  width=COLUMNS*CELL_SIZE)
 canva.pack()
 for i in range(ROWS):
     for j in range(COLUMNS):
@@ -62,7 +73,14 @@ for i in range(ROWS):
         else:
             color = BACKGROUND_COLOR_2
         canva.create_rectangle(x0, y0, x1, y1, fill=color)
+    
+    # commands :
+window.bind('<Left>', lambda event : on_key_press('LEFT'))
+window.bind('<Right>', lambda event : on_key_press('RIGHT'))
+window.bind('<Up>', lambda event : on_key_press('UP'))
+window.bind('<Down>', lambda event : on_key_press('DOWN'))
 
+# var :
 snake = Snake()
 apple = Apple()
 current_direction = 'RIGHT'
@@ -92,7 +110,11 @@ def actions_auto():
         canva.delete(snake.squares[-1])
         snake.squares.pop()
         snake.coordinates.insert(0, (x, y))
-        snake.squares.insert(0, canva.create_rectangle(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=snake.color))
+        snake.squares.insert(0, canva.create_rectangle(x*CELL_SIZE, 
+                                                       y*CELL_SIZE, 
+                                                       x*CELL_SIZE+CELL_SIZE, 
+                                                       y*CELL_SIZE+CELL_SIZE, 
+                                                       fill=snake.color))
         window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
@@ -124,11 +146,6 @@ def new_apple():
 def game_over():
     # afficher le message de game over
     pass
-
-window.bind('<Left>', lambda event : on_key_press('LEFT'))
-window.bind('<Right>', lambda event : on_key_press('RIGHT'))
-window.bind('<Up>', lambda event : on_key_press('UP'))
-window.bind('<Down>', lambda event : on_key_press('DOWN'))
 
 init_game()
 
