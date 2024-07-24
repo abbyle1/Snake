@@ -6,8 +6,9 @@ CELL_SIZE=40
 ROWS=10
 COLUMNS=10
 SPEED=500 # reaction time of the loop game in millisec (bigger = slower)
-BACKGROUND_COLOR_1='#111111'
-BACKGROUND_COLOR_2='#303030'
+BACKGROUND_COLOR_0='#111111'
+BACKGROUND_COLOR_1='#111111' # '#000033'
+BACKGROUND_COLOR_2='#303030' # '#000066'
 
 class Snake:
     def __init__(self):
@@ -58,7 +59,7 @@ label.pack()
 
     # draughtboard :
 canva = tk.Canvas(window, 
-                  background=BACKGROUND_COLOR_1, 
+                  background=BACKGROUND_COLOR_0,
                   height=ROWS*CELL_SIZE-1, 
                   width=COLUMNS*CELL_SIZE-1)
 canva.pack()
@@ -87,6 +88,7 @@ current_direction = 'RIGHT'
 
 # config game :
 def init_game():
+    # TODO message de start
     # canva.create_text(text='START?', font=('consolas', 20))
     window.after(SPEED, actions_auto)
 
@@ -100,11 +102,8 @@ def actions_auto():
         y -= 1
     elif (current_direction == 'DOWN'):
         y += 1
-
-    if check_collisions():
+    if check_collisions(x, y):
         game_over()
-    elif check_eating():
-        new_apple()
     else:
         snake.coordinates.pop()
         canva.delete(snake.squares[-1])
@@ -115,6 +114,8 @@ def actions_auto():
                                                        x*CELL_SIZE+CELL_SIZE, 
                                                        y*CELL_SIZE+CELL_SIZE, 
                                                        fill=snake.color))
+        if check_eating(x, y):
+            new_apple()
         window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
@@ -126,26 +127,34 @@ def on_key_press(new_direction:str):
        (current_direction == 'DOWN' and new_direction == 'UP'):
         pass
     else:
-        current_direction = new_direction        
+        current_direction = new_direction
 
-def check_collisions():
-    # si le snake se mange lui-même
-    # si le snake se mange un mur
-    pass
+def check_collisions(x:int, y:int):
+    if (x < 0 or x > COLUMNS-1 or y < 0 or y > ROWS-1): # wall
+        return True
+    if (x, y) in snake.coordinates: # eat himself
+        return True
+    return False
 
-def check_eating():
-    # si le snake se trouve sur une case pomme
-    pass
+def check_eating(x:int, y:int):
+    x_apple, y_apple = apple.coordinates
+    if (x == x_apple and y == y_apple):
+        return True
+    return False
 
 def new_apple():
+    # TODO
+    print('mangé')
     # suppression de l'apple
     # génération d'une nouvelle apple
     # + 1 membre au snake
+    # + 1 au score
     pass
 
 def game_over():
-    # afficher le message de game over
-    pass
+    canva.delete(tk.ALL)
+    # TODO game over message
+    # TODO retry button
 
 init_game()
 
