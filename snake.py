@@ -59,8 +59,8 @@ label.pack()
     # draughtboard :
 canva = tk.Canvas(window, 
                   background=BACKGROUND_COLOR_1, 
-                  height=ROWS*CELL_SIZE, 
-                  width=COLUMNS*CELL_SIZE)
+                  height=ROWS*CELL_SIZE-1, 
+                  width=COLUMNS*CELL_SIZE-1)
 canva.pack()
 for i in range(ROWS):
     for j in range(COLUMNS):
