@@ -5,16 +5,19 @@ import random as rdm
 CELL_SIZE=40
 ROWS=10
 COLUMNS=10
+SPEED=1000 # reaction time of the loop game in millisec (bigger = slower)
 BACKGROUND_COLOR_1='#111111'
 BACKGROUND_COLOR_2='#303030'
 
 class Snake:
     def __init__(self):
         self.body_parts = 3
-        self.coordinates = [(1,8), (2,8), (3,8)]
+        self.coordinates = [(3,8), (2,8), (1,8)]
+        self.squares = []
         self.color = '#00FF00'
         for (x, y) in self.coordinates:
-            canva.create_rectangle(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=self.color)
+            square = canva.create_rectangle(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=self.color)
+            self.squares.append(square)
     
     def add_body_part(self, new_part:tuple[int,int]):
         self.coordinates.append(new_part)
@@ -35,15 +38,13 @@ class Apple:
             if (x, y) not in snake.coordinates:
                 return (x, y)
 
-# var :
-score = 0
-
 # config interface :
 window = tk.Tk()
 window.title('SNAKE')
 window.resizable(width=False, height=False)
 
     # score :
+score = 0
 label = tk.Label(window, text=f'SCORE:{score}', font=('consolas', 20))
 label.pack()
 
@@ -64,27 +65,72 @@ for i in range(ROWS):
 
 snake = Snake()
 apple = Apple()
+current_direction = 'RIGHT'
 
 # config game :
 def init_game():
-    pass
+    # canva.create_text(text='START?', font=('consolas', 20))
+    window.after(SPEED, actions_auto)
 
-def on_key_press():
-    # changer de direction
-        # LEFT :    appliquer (x-=1,y)
-        # RIGHT :   appliquer (x+=1,y)
-        # UP :      appliquer (x,y+=1)
-        # DOWN :    appliquer (x,y-=1)
-    pass
+def actions_auto():
+    x, y = snake.coordinates[0]
+    if (current_direction == 'RIGHT'): # XXX add a local var to optimize
+        x += 1
+    elif (current_direction == 'LEFT'):
+        x -= 1
+    elif (current_direction == 'UP'):
+        y -= 1
+    elif (current_direction == 'DOWN'):
+        y += 1
+
+    if check_collisions():
+        game_over()
+    elif check_eating():
+        new_apple()
+    else:
+        snake.coordinates.pop()
+        canva.delete(snake.squares[-1])
+        snake.squares.pop()
+        snake.coordinates.insert(0, (x, y))
+        snake.squares.insert(0, canva.create_rectangle(x*CELL_SIZE, y*CELL_SIZE, x*CELL_SIZE+CELL_SIZE, y*CELL_SIZE+CELL_SIZE, fill=snake.color))
+        window.after(SPEED, actions_auto)
+
+def on_key_press(new_direction:str):
+    # FIXME possibilité de revenir de faire un move interdit si on presse rapidement 2 touches
+    global current_direction # to avoid this error: UnboundLocalError: local variable 'current_direction' referenced before assignment
+    if (current_direction == 'RIGHT' and new_direction == 'LEFT') or \
+       (current_direction == 'LEFT' and new_direction == 'RIGHT') or \
+       (current_direction == 'UP' and new_direction == 'DOWN') or \
+       (current_direction == 'DOWN' and new_direction == 'UP'):
+        pass
+    else:
+        current_direction = new_direction        
 
 def check_collisions():
-    # si le snake tente de se positionner derrière un mur
-    # si le serpend se mange lui-même
+    # si le snake se mange lui-même
+    # si le snake se mange un mur
+    pass
+
+def check_eating():
+    # si le snake se trouve sur une case pomme
+    pass
+
+def new_apple():
+    # suppression de l'apple
+    # génération d'une nouvelle apple
+    # + 1 membre au snake
     pass
 
 def game_over():
     # afficher le message de game over
     pass
+
+window.bind('<Left>', lambda event : on_key_press('LEFT'))
+window.bind('<Right>', lambda event : on_key_press('RIGHT'))
+window.bind('<Up>', lambda event : on_key_press('UP'))
+window.bind('<Down>', lambda event : on_key_press('DOWN'))
+
+init_game()
 
 # launch :
 window.mainloop()
