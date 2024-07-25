@@ -1,17 +1,21 @@
 import tkinter as tk
 import random as rdm
 
+# TODO : the game is won when all the table is green
+# TODO : rewrite code repetitions
+
 # const :
 CELL_SIZE=50
-ROWS=10
-COLUMNS=10
-SPEED=200 # reaction time of the loop game in millisec (bigger = slower)
+ROWS=5
+COLUMNS=5
+SPEED=400 # reaction time of the loop game in millisec (bigger = slower)
 BACKGROUND_COLOR_0='#111111'
 BACKGROUND_COLOR_1='#111111' # '#000033'
 BACKGROUND_COLOR_2='#303030' # '#000066'
 
 class Snake:
     def __init__(self):
+        self.body_part = 0
         self.coordinates = []
         self.squares = []
         self.color = '#00FF00'
@@ -107,7 +111,7 @@ def start():
 
 def init_game():
     global snake, apple, current_direction, retry_button, start_button, score
-    canva.delete('game_over', 'start')
+    canva.delete('game_over', 'start', 'you_won', 'snake', 'apple')
     snake = Snake()
     apple = Apple()
     score = 0
@@ -137,9 +141,10 @@ def actions_auto():
         snake_deplacement_auto(x, y)
         if check_eating(x, y):
             new_apple()
-        # if (score == ):
-            
-        window.after(SPEED, actions_auto)
+        if (snake.body_part == ROWS*COLUMNS):
+            you_won()
+        else:
+            window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
     # FIXME possibilité de revenir de faire un move interdit si on presse rapidement 2 touches
@@ -172,11 +177,12 @@ def check_eating(x:int, y:int):
     return False
 
 def new_apple():
-    global apple, score
+    global apple, score, snake
     canva.delete('apple')
     snake.add_body_part(apple.coordinates)
     apple = Apple()
     score += 1
+    snake.body_part += 1
     label.config(text=f'SCORE:{score}')
 
 def game_over():
@@ -194,8 +200,17 @@ def game_over():
                         window=retry_button)
     
 def you_won():
-    # TODO
-    pass
+    global retry_button
+    canva.create_text(CELL_SIZE*ROWS / 2, 
+                      CELL_SIZE*COLUMNS /2,
+                      text="YOU WON",
+                      font=('consolas', CELL_SIZE),
+                      fill='#0000FF',
+                      tag='you_won')
+    retry_button = tk.Button(window, text='PLAY AGAIN', command=init_game)
+    canva.create_window(CELL_SIZE*ROWS / 2,
+                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
+                        window=retry_button)
 
 start()
 
