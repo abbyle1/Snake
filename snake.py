@@ -148,7 +148,7 @@ def actions_auto():
             window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
-    # FIXME can go back by pression fastly 2 commands
+    # FIXME can go back by pressing fastly 2 commands
     global current_direction # to avoid this error: UnboundLocalError: local variable 'current_direction' referenced before assignment
     if (current_direction == 'RIGHT' and new_direction == 'LEFT') or \
        (current_direction == 'LEFT' and new_direction == 'RIGHT') or \
