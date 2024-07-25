@@ -155,8 +155,13 @@ def new_apple():
     pass
 
 def game_over():
-    canva.delete(tk.ALL)
-    # TODO game over message
+    canva.delete('snake', 'apple')
+    canva.create_text(canva.winfo_width()/2, 
+                      canva.winfo_height()/2,
+                      text="GAME OVER",
+                      font=('consolas', CELL_SIZE),
+                      fill='#FF0000',
+                      tag='game_over')
     # TODO retry button
 
 init_game()
