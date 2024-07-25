@@ -3,6 +3,7 @@ import random as rdm
 
 # TODO : the game is won when all the table is green
 # TODO : rewrite code repetitions
+# TODO : separate class in files and have a better oop implementation
 
 # const :
 CELL_SIZE=50
@@ -147,7 +148,7 @@ def actions_auto():
             window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
-    # FIXME possibilité de revenir de faire un move interdit si on presse rapidement 2 touches
+    # FIXME can go back by pression fastly 2 commands
     global current_direction # to avoid this error: UnboundLocalError: local variable 'current_direction' referenced before assignment
     if (current_direction == 'RIGHT' and new_direction == 'LEFT') or \
        (current_direction == 'LEFT' and new_direction == 'RIGHT') or \
