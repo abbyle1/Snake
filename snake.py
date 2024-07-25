@@ -5,7 +5,7 @@ import random as rdm
 CELL_SIZE=40
 ROWS=10
 COLUMNS=10
-SPEED=500 # reaction time of the loop game in millisec (bigger = slower)
+SPEED=200 # reaction time of the loop game in millisec (bigger = slower)
 BACKGROUND_COLOR_0='#111111'
 BACKGROUND_COLOR_1='#111111' # '#000033'
 BACKGROUND_COLOR_2='#303030' # '#000066'
@@ -15,19 +15,20 @@ class Snake:
         self.coordinates = []
         self.squares = []
         self.color = '#00FF00'
-        initial_coords = [(3,8), (2,8), (1,8)]
+        initial_coords = [(1,8), (2,8), (3,8)]
         for (x, y) in initial_coords:
             self.add_body_part((x, y))
     
     def add_body_part(self, new_part:tuple[int,int]):
-        self.coordinates.append(new_part)
+        self.coordinates.insert(0, new_part)
         x, y = new_part
         square = canva.create_rectangle(x*CELL_SIZE,
                                         y*CELL_SIZE,
                                         x*CELL_SIZE+CELL_SIZE,
                                         y*CELL_SIZE+CELL_SIZE,
-                                        fill=self.color)
-        self.squares.append(square)
+                                        fill=self.color,
+                                        tag='snake')
+        self.squares.insert(0, square)
         
 class Apple:
     def __init__(self):
@@ -107,16 +108,7 @@ def actions_auto():
     if check_collisions(x, y):
         game_over()
     else:
-        # snake moves forward
-        snake.coordinates.pop()
-        canva.delete(snake.squares[-1])
-        snake.squares.pop()
-        snake.coordinates.insert(0, (x, y))
-        snake.squares.insert(0, canva.create_rectangle(x*CELL_SIZE, 
-                                                       y*CELL_SIZE, 
-                                                       x*CELL_SIZE+CELL_SIZE, 
-                                                       y*CELL_SIZE+CELL_SIZE, 
-                                                       fill=snake.color))
+        snake_deplacement_auto(x, y)
         # did he eat on apple ?
         if check_eating(x, y):
             new_apple()
@@ -139,6 +131,12 @@ def check_collisions(x:int, y:int):
     if (x, y) in snake.coordinates: # eat himself
         return True
     return False
+
+def snake_deplacement_auto(x, y):
+    snake.coordinates.pop()
+    canva.delete(snake.squares[-1])
+    snake.squares.pop()
+    snake.add_body_part((x, y))
 
 def check_eating(x:int, y:int):
     x_apple, y_apple = apple.coordinates
