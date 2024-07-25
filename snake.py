@@ -85,19 +85,30 @@ window.bind('<Up>', lambda event : on_key_press('UP'))
 window.bind('<Down>', lambda event : on_key_press('DOWN'))
 
 # var :
-snake = Snake()
-apple = Apple()
+snake = None
+apple = None
 current_direction = 'RIGHT'
+retry_button = None
 
 # config game :
 def init_game():
     # TODO message de start
     # canva.create_text(text='START?', font=('consolas', 20))
+    global snake, apple, current_direction, retry_button, score
+    canva.delete('game_over')
+    snake = Snake()
+    apple = Apple()
+    score = 0
+    label.config(text=f'SCORE:{score}')
+    current_direction = 'RIGHT'
+    if (retry_button):
+        retry_button.destroy()
+        retry_button = None
     window.after(SPEED, actions_auto)
 
 def actions_auto():
     x, y = snake.coordinates[0]
-    if (current_direction == 'RIGHT'): # XXX add a local var to optimize
+    if (current_direction == 'RIGHT'):
         x += 1
     elif (current_direction == 'LEFT'):
         x -= 1
@@ -109,7 +120,6 @@ def actions_auto():
         game_over()
     else:
         snake_deplacement_auto(x, y)
-        # did he eat on apple ?
         if check_eating(x, y):
             new_apple()
         window.after(SPEED, actions_auto)
@@ -145,16 +155,16 @@ def check_eating(x:int, y:int):
     return False
 
 def new_apple():
-    global apple
+    global apple, score
     canva.delete('apple')
     snake.add_body_part(apple.coordinates)
     apple = Apple()
-    global score
     score += 1
     label.config(text=f'SCORE:{score}')
     pass
 
 def game_over():
+    global retry_button
     canva.delete('snake', 'apple')
     canva.create_text(canva.winfo_width()/2, 
                       canva.winfo_height()/2,
@@ -162,7 +172,10 @@ def game_over():
                       font=('consolas', CELL_SIZE),
                       fill='#FF0000',
                       tag='game_over')
-    # TODO retry button
+    retry_button = tk.Button(window, text='RETRY', command=init_game)
+    canva.create_window(canva.winfo_width() / 2,
+                        canva.winfo_height() / 2 + CELL_SIZE,
+                        window=retry_button)
 
 init_game()
 
