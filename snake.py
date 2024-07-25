@@ -2,7 +2,7 @@ import tkinter as tk
 import random as rdm
 
 # const :
-CELL_SIZE=40
+CELL_SIZE=50
 ROWS=10
 COLUMNS=10
 SPEED=200 # reaction time of the loop game in millisec (bigger = slower)
@@ -15,7 +15,7 @@ class Snake:
         self.coordinates = []
         self.squares = []
         self.color = '#00FF00'
-        initial_coords = [(1,8), (2,8), (3,8)]
+        initial_coords = [(1,1), (2,1), (3,1)]
         for (x, y) in initial_coords:
             self.add_body_part((x, y))
     
@@ -88,19 +88,34 @@ window.bind('<Down>', lambda event : on_key_press('DOWN'))
 snake = None
 apple = None
 current_direction = 'RIGHT'
+start_button = None
 retry_button = None
 
 # config game :
+def start():
+    global start_button
+    canva.create_text(CELL_SIZE*ROWS / 2, 
+                      CELL_SIZE*COLUMNS /2,
+                      text="SNAKE",
+                      font=('consolas', CELL_SIZE),
+                      fill='#00FF00',
+                      tag='start')
+    start_button = tk.Button(window, text='START', command=init_game)
+    canva.create_window(CELL_SIZE*ROWS / 2,
+                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
+                        window=start_button)
+
 def init_game():
-    # TODO message de start
-    # canva.create_text(text='START?', font=('consolas', 20))
-    global snake, apple, current_direction, retry_button, score
-    canva.delete('game_over')
+    global snake, apple, current_direction, retry_button, start_button, score
+    canva.delete('game_over', 'start')
     snake = Snake()
     apple = Apple()
     score = 0
     label.config(text=f'SCORE:{score}')
     current_direction = 'RIGHT'
+    if (start_button):
+        start_button.destroy()
+        start_button = None
     if (retry_button):
         retry_button.destroy()
         retry_button = None
@@ -122,6 +137,8 @@ def actions_auto():
         snake_deplacement_auto(x, y)
         if check_eating(x, y):
             new_apple()
+        # if (score == ):
+            
         window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
@@ -161,23 +178,26 @@ def new_apple():
     apple = Apple()
     score += 1
     label.config(text=f'SCORE:{score}')
-    pass
 
 def game_over():
     global retry_button
     canva.delete('snake', 'apple')
-    canva.create_text(canva.winfo_width()/2, 
-                      canva.winfo_height()/2,
+    canva.create_text(CELL_SIZE*ROWS / 2, 
+                      CELL_SIZE*COLUMNS /2,
                       text="GAME OVER",
                       font=('consolas', CELL_SIZE),
                       fill='#FF0000',
                       tag='game_over')
     retry_button = tk.Button(window, text='RETRY', command=init_game)
-    canva.create_window(canva.winfo_width() / 2,
-                        canva.winfo_height() / 2 + CELL_SIZE,
+    canva.create_window(CELL_SIZE*ROWS / 2, 
+                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
                         window=retry_button)
+    
+def you_won():
+    # TODO
+    pass
 
-init_game()
+start()
 
 # launch :
 window.mainloop()
