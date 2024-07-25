@@ -12,21 +12,22 @@ BACKGROUND_COLOR_2='#303030' # '#000066'
 
 class Snake:
     def __init__(self):
-        self.body_parts = 3
-        self.coordinates = [(3,8), (2,8), (1,8)]
+        self.coordinates = []
         self.squares = []
         self.color = '#00FF00'
-        for (x, y) in self.coordinates:
-            square = canva.create_rectangle(x*CELL_SIZE, 
-                                            y*CELL_SIZE, 
-                                            x*CELL_SIZE+CELL_SIZE, 
-                                            y*CELL_SIZE+CELL_SIZE, 
-                                            fill=self.color)
-            self.squares.append(square)
+        initial_coords = [(3,8), (2,8), (1,8)]
+        for (x, y) in initial_coords:
+            self.add_body_part((x, y))
     
     def add_body_part(self, new_part:tuple[int,int]):
         self.coordinates.append(new_part)
-        self.body_parts += 1
+        x, y = new_part
+        square = canva.create_rectangle(x*CELL_SIZE,
+                                        y*CELL_SIZE,
+                                        x*CELL_SIZE+CELL_SIZE,
+                                        y*CELL_SIZE+CELL_SIZE,
+                                        fill=self.color)
+        self.squares.append(square)
         
 class Apple:
     def __init__(self):
@@ -37,7 +38,8 @@ class Apple:
                           y*CELL_SIZE, 
                           x*CELL_SIZE+CELL_SIZE, 
                           y*CELL_SIZE+CELL_SIZE, 
-                          fill=self.color)
+                          fill=self.color,
+                          tag='apple')
 
     @staticmethod
     def __get_rdm_coord():
@@ -105,6 +107,7 @@ def actions_auto():
     if check_collisions(x, y):
         game_over()
     else:
+        # snake moves forward
         snake.coordinates.pop()
         canva.delete(snake.squares[-1])
         snake.squares.pop()
@@ -114,6 +117,7 @@ def actions_auto():
                                                        x*CELL_SIZE+CELL_SIZE, 
                                                        y*CELL_SIZE+CELL_SIZE, 
                                                        fill=snake.color))
+        # did he eat on apple ?
         if check_eating(x, y):
             new_apple()
         window.after(SPEED, actions_auto)
@@ -143,12 +147,13 @@ def check_eating(x:int, y:int):
     return False
 
 def new_apple():
-    # TODO
-    print('mangé')
-    # suppression de l'apple
-    # génération d'une nouvelle apple
-    # + 1 membre au snake
-    # + 1 au score
+    global apple
+    canva.delete('apple')
+    snake.add_body_part(apple.coordinates)
+    apple = Apple()
+    global score
+    score += 1
+    label.config(text=f'SCORE:{score}')
     pass
 
 def game_over():
