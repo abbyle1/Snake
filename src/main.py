@@ -1,61 +1,29 @@
+# main.py
+
 import tkinter as tk
-import random as rdm
+from snake import Snake
+from apple import Apple
+from config import *
 
 # TODO : the game is won when all the table is green
+#   - cond : (ROWS*COLUMNS - 3)
+#   - delete first tail then head
+#   - make the head grow when eating
 # TODO : rewrite code repetitions
-# TODO : separate class in files and have a better oop implementation
 
-# const :
-CELL_SIZE=50
-ROWS=5
-COLUMNS=5
-SPEED=400 # reaction time of the loop game in millisec (bigger = slower)
-BACKGROUND_COLOR_0='#111111'
-BACKGROUND_COLOR_1='#111111' # '#000033'
-BACKGROUND_COLOR_2='#303030' # '#000066'
+#####################################################
+#                    variables                      #
+#####################################################
 
-class Snake:
-    def __init__(self):
-        self.body_part = 0
-        self.coordinates = []
-        self.squares = []
-        self.color = '#00FF00'
-        initial_coords = [(1,1), (2,1), (3,1)]
-        for (x, y) in initial_coords:
-            self.add_body_part((x, y))
-    
-    def add_body_part(self, new_part:tuple[int,int]):
-        self.coordinates.insert(0, new_part)
-        x, y = new_part
-        square = canva.create_rectangle(x*CELL_SIZE,
-                                        y*CELL_SIZE,
-                                        x*CELL_SIZE+CELL_SIZE,
-                                        y*CELL_SIZE+CELL_SIZE,
-                                        fill=self.color,
-                                        tag='snake')
-        self.squares.insert(0, square)
-        
-class Apple:
-    def __init__(self):
-        self.coordinates = self.__get_rdm_coord()
-        x, y = self.coordinates
-        self.color ='#FF0000'
-        canva.create_oval(x*CELL_SIZE, 
-                          y*CELL_SIZE, 
-                          x*CELL_SIZE+CELL_SIZE, 
-                          y*CELL_SIZE+CELL_SIZE, 
-                          fill=self.color,
-                          tag='apple')
+snake = None
+apple = None
+current_direction = 'RIGHT'
+start_button = None
+retry_button = None
 
-    @staticmethod
-    def __get_rdm_coord():
-        while True:
-            x = rdm.randint(0, COLUMNS-1)
-            y = rdm.randint(0, ROWS-1)
-            if (x, y) not in snake.coordinates:
-                return (x, y)
-
-# config interface :
+#####################################################
+#                 config interface                  #
+#####################################################
 window = tk.Tk()
 window.title('SNAKE')
 window.resizable(width=False, height=False)
@@ -89,14 +57,9 @@ window.bind('<Right>', lambda event : on_key_press('RIGHT'))
 window.bind('<Up>', lambda event : on_key_press('UP'))
 window.bind('<Down>', lambda event : on_key_press('DOWN'))
 
-# var :
-snake = None
-apple = None
-current_direction = 'RIGHT'
-start_button = None
-retry_button = None
-
-# config game :
+#####################################################
+#                   config game                     #
+#####################################################
 def start():
     global start_button
     canva.create_text(CELL_SIZE*ROWS / 2, 
@@ -113,8 +76,8 @@ def start():
 def init_game():
     global snake, apple, current_direction, retry_button, start_button, score
     canva.delete('game_over', 'start', 'you_won', 'snake', 'apple')
-    snake = Snake()
-    apple = Apple()
+    snake = Snake(canva)
+    apple = Apple(canva, snake)
     score = 0
     label.config(text=f'SCORE:{score}')
     current_direction = 'RIGHT'
@@ -181,7 +144,7 @@ def new_apple():
     global apple, score, snake
     canva.delete('apple')
     snake.add_body_part(apple.coordinates)
-    apple = Apple()
+    apple = Apple(canva, snake)
     score += 1
     snake.body_part += 1
     label.config(text=f'SCORE:{score}')
@@ -213,7 +176,9 @@ def you_won():
                         CELL_SIZE*COLUMNS /2 + CELL_SIZE,
                         window=retry_button)
 
-start()
-
-# launch :
-window.mainloop()
+#####################################################
+#                       main                        #
+#####################################################
+if __name__ == "__main__":
+    start()
+    window.mainloop()
