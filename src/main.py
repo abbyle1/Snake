@@ -9,7 +9,6 @@ from config import *
 #   - cond : (ROWS*COLUMNS - 3)
 #   - delete first tail then head
 #   - make the head grow when eating
-# TODO : rewrite code repetitions
 
 #####################################################
 #                    variables                      #
@@ -61,17 +60,7 @@ window.bind('<Down>', lambda event : on_key_press('DOWN'))
 #                   config game                     #
 #####################################################
 def start():
-    global start_button
-    canva.create_text(CELL_SIZE*ROWS / 2, 
-                      CELL_SIZE*COLUMNS /2,
-                      text="SNAKE",
-                      font=('consolas', CELL_SIZE),
-                      fill='#00FF00',
-                      tag='start')
-    start_button = tk.Button(window, text='START', command=init_game)
-    canva.create_window(CELL_SIZE*ROWS / 2,
-                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
-                        window=start_button)
+    create_message_and_button("SNAKE", '#00FF00', 'start', 'start_button', 'START')
 
 def init_game():
     global snake, apple, current_direction, retry_button, start_button, score
@@ -111,7 +100,7 @@ def actions_auto():
             window.after(SPEED, actions_auto)
 
 def on_key_press(new_direction:str):
-    # FIXME can go back by pressing fastly 2 commands
+    # FIXME can go back by pressing fastly 2 commands (and eat himself)
     global current_direction # to avoid this error: UnboundLocalError: local variable 'current_direction' referenced before assignment
     if (current_direction == 'RIGHT' and new_direction == 'LEFT') or \
        (current_direction == 'LEFT' and new_direction == 'RIGHT') or \
@@ -150,31 +139,31 @@ def new_apple():
     label.config(text=f'SCORE:{score}')
 
 def game_over():
-    global retry_button
     canva.delete('snake', 'apple')
-    canva.create_text(CELL_SIZE*ROWS / 2, 
-                      CELL_SIZE*COLUMNS /2,
-                      text="GAME OVER",
-                      font=('consolas', CELL_SIZE),
-                      fill='#FF0000',
-                      tag='game_over')
-    retry_button = tk.Button(window, text='RETRY', command=init_game)
-    canva.create_window(CELL_SIZE*ROWS / 2, 
-                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
-                        window=retry_button)
+    create_message_and_button("GAME OVER", '#FF0000', 'game_over', 'retry_button', 'RETRY')
     
 def you_won():
-    global retry_button
+    create_message_and_button("YOU WON", '#0000FF', 'you_won', 'retry_button', 'PLAY AGAIN')
+
+def create_message_and_button(text:str, color:str, tag:str, button:str, button_text:str):
+    global retry_button, start_button
     canva.create_text(CELL_SIZE*ROWS / 2, 
                       CELL_SIZE*COLUMNS /2,
-                      text="YOU WON",
+                      text=text,
                       font=('consolas', CELL_SIZE),
-                      fill='#0000FF',
-                      tag='you_won')
-    retry_button = tk.Button(window, text='PLAY AGAIN', command=init_game)
-    canva.create_window(CELL_SIZE*ROWS / 2,
-                        CELL_SIZE*COLUMNS /2 + CELL_SIZE,
-                        window=retry_button)
+                      fill=color,
+                      tag=tag)
+    if button == 'retry_button':
+        retry_button = tk.Button(window, text=button_text, command=init_game)
+        canva.create_window(CELL_SIZE*ROWS / 2,
+                            CELL_SIZE*COLUMNS /2 + CELL_SIZE,
+                            window=retry_button)
+    else:
+        start_button = tk.Button(window, text=button_text, command=init_game)
+        canva.create_window(CELL_SIZE*ROWS / 2,
+                            CELL_SIZE*COLUMNS /2 + CELL_SIZE,
+                            window=start_button)
+
 
 #####################################################
 #                       main                        #
